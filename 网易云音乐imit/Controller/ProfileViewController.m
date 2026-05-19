@@ -9,12 +9,14 @@
 #import "GroupSong.h"
 #import <Masonry/Masonry.h>
 #import "ProfileSectionTableViewCell.h"
+#import "AvatorChangeViewController.h"
 #import "ProfileGroupSongTableViewCell.h"
 #import "ProfileHeader.h"
 
-@interface ProfileViewController () <UITableViewDelegate, UITableViewDataSource>
+@interface ProfileViewController () <UITableViewDelegate, UITableViewDataSource, AvatorChangeDelegate>
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NSMutableArray *section;
+@property (nonatomic, strong) UIImageView *avator;
 @end
 
 @implementation ProfileViewController
@@ -136,12 +138,15 @@
         make.height.mas_equalTo(160);
     }];
     
-    UIImageView *avator = [[UIImageView alloc] init];
-    avator.image = [UIImage imageNamed:@"HeadPicture"];
-    avator.clipsToBounds = YES;
-    avator.layer.cornerRadius = 26;
-    [back addSubview:avator];
-    [avator mas_makeConstraints:^(MASConstraintMaker *make) {
+    self.avator = [[UIImageView alloc] init];
+    self.avator.image = [UIImage imageNamed:@"HeadPicture"];
+    self.avator.clipsToBounds = YES;
+    self.avator.layer.cornerRadius = 26;
+    self.avator.userInteractionEnabled = YES;
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(avatorTapped)];
+    [self.avator addGestureRecognizer:tap];
+    [back addSubview:self.avator];
+    [self.avator mas_makeConstraints:^(MASConstraintMaker *make) {
         make.width.height.mas_equalTo(52);
         make.top.left.equalTo(back).offset(16);
     }];
@@ -151,16 +156,16 @@
     name.font = [UIFont systemFontOfSize:16 weight:UIFontWeightRegular];
     [back addSubview:name];
     [name mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.equalTo(avator.mas_right).offset(16);
-        make.bottom.equalTo(avator.mas_centerY);
+        make.left.equalTo(self.avator.mas_right).offset(16);
+        make.bottom.equalTo(self.avator.mas_centerY);
     }];
     
     UIImageView *VIP = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"VIP"]];
     [back addSubview:VIP];
     [VIP mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.equalTo(avator.mas_right).offset(16);
-        make.top.equalTo(avator.mas_centerY).offset(-2);
-        make.bottom.equalTo(avator).offset(2);
+        make.left.equalTo(self.avator.mas_right).offset(16);
+        make.top.equalTo(self.avator.mas_centerY).offset(-2);
+        make.bottom.equalTo(self.avator).offset(2);
         make.centerX.equalTo(back);
     }];
     
@@ -173,7 +178,7 @@
     [looker mas_makeConstraints:^(MASConstraintMaker *make) {
         make.right.equalTo(back).offset(-16);
         make.width.mas_equalTo(40);
-        make.top.bottom.equalTo(avator);
+        make.top.bottom.equalTo(self.avator);
     }];
     
     CGFloat width = (self.view.bounds.size.width - 32) / 4;
@@ -239,7 +244,7 @@
         UIImageView *img = [[UIImageView alloc] initWithImage:[UIImage systemImageNamed:pic[i]]];
         UILabel *tit = [[UILabel alloc] init];
         UILabel *num = [[UILabel alloc] init];
-        img.tintColor = [UIColor blackColor];
+        img.tintColor = [UIColor labelColor];
         tit.text = titles[i];
         tit.font = [UIFont systemFontOfSize:14 weight:UIFontWeightRegular];
         num.text = number[i];
@@ -347,6 +352,18 @@
     self.navigationItem.leftBarButtonItem = my;
     self.navigationItem.rightBarButtonItems = @[enve, setting];
     self.navigationController.navigationBar.translucent = NO;
+}
+
+- (void)avatorTapped {
+    AvatorChangeViewController *avatorChange = [[AvatorChangeViewController alloc] init];
+    avatorChange.title = @"头像修改";
+    avatorChange.avatorImage = self.avator.image;
+    avatorChange.delegate = self;
+    [self.navigationController pushViewController:avatorChange animated:YES];
+}
+
+- (void)changePictureWithImage:(UIImage *)image {
+    self.avator.image = image;
 }
 
 @end
