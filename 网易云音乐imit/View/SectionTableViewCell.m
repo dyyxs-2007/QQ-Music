@@ -15,6 +15,7 @@
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UICollectionViewFlowLayout *layout;
 @property (nonatomic, assign) CellType cellType;
+
 @end
 
 @implementation SectionTableViewCell
@@ -49,6 +50,14 @@
     }
     SongViewCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"Collection" forIndexPath:indexPath];
     [cell configWithData:self.songs[indexPath.item]];
+    __weak typeof(self) weakSelf = self;
+    cell.changePlay = ^{
+        NSLog(@"手势被处理，更新了item");
+        if (weakSelf.changePlay) {
+            NSIndexPath *ixp = [NSIndexPath indexPathForItem:indexPath.item inSection:self.section];
+            weakSelf.changePlay(ixp);
+        }
+    };
     return cell;
 }
 
@@ -84,8 +93,11 @@
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];
-
     // Configure the view for the selected state
+}
+
+- (void)fresh {
+    [self.collectionView reloadData];
 }
 
 @end

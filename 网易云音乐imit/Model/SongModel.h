@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *songName;
 @property (nonatomic, copy) NSString *master;
 @property (nonatomic, copy) NSString *picture;
+@property (nonatomic, assign) BOOL isPlay;
 @end
 
 NS_ASSUME_NONNULL_END

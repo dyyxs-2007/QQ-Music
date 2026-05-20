@@ -16,6 +16,7 @@
 @interface HomeViewController () <UITableViewDelegate, UITableViewDataSource>
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NSMutableArray *section;
+@property (nonatomic, strong) NSIndexPath *index;
 @end
 
 @implementation HomeViewController
@@ -57,6 +58,29 @@
     SectionModel *model = self.section[indexPath.section];
     
     SectionTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Section" forIndexPath:indexPath];
+    cell.section = indexPath.section;
+    __weak typeof(self) weakSelf = self;
+    cell.changePlay = ^(NSIndexPath * _Nonnull ixP) {
+        NSLog(@"最高层受理");
+        
+        // 1. 关掉旧歌，并刷新旧歌所在 section
+        if (weakSelf.index != nil && ![weakSelf.index isEqual:ixP]) {
+            SectionModel *sectionModel = weakSelf.section[weakSelf.index.section];
+            SongModel *songModel = sectionModel.songs[weakSelf.index.row];
+            songModel.isPlay = NO;
+            NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:weakSelf.index.section];
+            [weakSelf.tableView reloadSections:indexSet withRowAnimation:UITableViewRowAnimationNone];
+        }
+        
+        // 2. 开启新歌，并刷新新歌所在 section
+        SectionModel *sectionModel = weakSelf.section[ixP.section];
+        SongModel *songModel = sectionModel.songs[ixP.item];
+        songModel.isPlay = YES;
+        NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:ixP.section];
+        [weakSelf.tableView reloadSections:indexSet withRowAnimation:UITableViewRowAnimationNone];
+        
+        weakSelf.index = ixP;
+    };
     if (indexPath.section == 0) {
         [cell configWithSong:model.songs CellType:Top];
     } else {
@@ -101,6 +125,7 @@
 }
 
 - (void)setupData {
+    self.index = nil;
     NSArray *head = @[
         @"Recesses",
         @"大家都在听",
@@ -175,6 +200,7 @@
             song.master = master[count];
             song.songName = songName[count];
             song.picture = picture[count];
+            song.isPlay = NO;
             [songs addObject:song];
         }
         sectionModel.songs = songs;

@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SongViewCollectionViewCell : UICollectionViewCell
 - (void)configWithData:(SongModel *)model;
+@property (nonatomic, copy) void(^changePlay)(void);
 @end
 
 NS_ASSUME_NONNULL_END

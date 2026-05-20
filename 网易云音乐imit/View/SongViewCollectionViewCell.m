@@ -10,6 +10,7 @@
 
 @interface SongViewCollectionViewCell ()
 @property (nonatomic, strong) UIImageView *picture;
+@property (nonatomic, strong) UIImageView *player;
 @property (nonatomic, strong) UILabel *songName;
 @property (nonatomic, strong) UILabel *master;
 @end
@@ -29,12 +30,19 @@
     self.picture = [[UIImageView alloc] init];
     self.songName = [[UILabel alloc] init];
     self.master = [[UILabel alloc] init];
+    self.player = [[UIImageView alloc] init];
+    [self.contentView addSubview:self.player];
     [self.contentView addSubview:self.picture];
     [self.contentView addSubview:self.songName];
     [self.contentView addSubview:self.master];
     
     self.picture.clipsToBounds = YES;
     self.picture.layer.cornerRadius = 4;
+    
+    self.player.tintColor = [UIColor labelColor];
+    self.player.userInteractionEnabled = YES;
+    UITapGestureRecognizer *gesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(playChange)];
+    [self.player addGestureRecognizer:gesture];
     
     self.songName.font = [UIFont systemFontOfSize:14 weight:UIFontWeightMedium];
     
@@ -54,12 +62,30 @@
         make.bottom.equalTo(self.contentView).offset(-8);
         make.left.equalTo(self.picture.mas_right).offset(32);
     }];
+    
+    [self.player mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerY.equalTo(self.contentView);
+        make.right.equalTo(self.contentView).offset(-28);
+        //make.height.width.equalTo(self.contentView.mas_height).offset(-52);
+    }];
 }
 
 - (void)configWithData:(SongModel *)model {
     self.picture.image = [UIImage imageNamed:model.picture];
     self.songName.text = model.songName;
     self.master.text = model.master;
+    if (model.isPlay == NO) {
+        self.player.image = [UIImage systemImageNamed:@"play.fill"];
+    } else {
+        self.player.image = [UIImage systemImageNamed:@"pause.fill"];
+    }
+}
+
+- (void)playChange {
+    NSLog(@"点击了手势");
+    if (self.changePlay) {
+        self.changePlay();
+    }
 }
 
 @end
