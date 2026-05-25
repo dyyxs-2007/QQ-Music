@@ -10,7 +10,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface SwitchStyle : NSObject
-
+@property (nonatomic, assign) BOOL isOn;
++ (instancetype)sharedInstance;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -33,6 +33,7 @@
     self.tableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
+    self.tableView.showsVerticalScrollIndicator = NO;
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     [self.view addSubview:self.tableView];
     [self.tableView mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -61,25 +62,23 @@
     cell.section = indexPath.section;
     __weak typeof(self) weakSelf = self;
     cell.changePlay = ^(NSIndexPath * _Nonnull ixP) {
-        NSLog(@"最高层受理");
-        
-        // 1. 关掉旧歌，并刷新旧歌所在 section
-        if (weakSelf.index != nil && ![weakSelf.index isEqual:ixP]) {
+        if (weakSelf.index != nil) {
             SectionModel *sectionModel = weakSelf.section[weakSelf.index.section];
             SongModel *songModel = sectionModel.songs[weakSelf.index.row];
-            songModel.isPlay = NO;
+            songModel.isPlay = !songModel.isPlay;
             NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:weakSelf.index.section];
             [weakSelf.tableView reloadSections:indexSet withRowAnimation:UITableViewRowAnimationNone];
         }
-        
-        // 2. 开启新歌，并刷新新歌所在 section
-        SectionModel *sectionModel = weakSelf.section[ixP.section];
-        SongModel *songModel = sectionModel.songs[ixP.item];
-        songModel.isPlay = YES;
-        NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:ixP.section];
-        [weakSelf.tableView reloadSections:indexSet withRowAnimation:UITableViewRowAnimationNone];
-        
-        weakSelf.index = ixP;
+        if (![weakSelf.index isEqual:ixP]) {
+            SectionModel *sectionModel = weakSelf.section[ixP.section];
+            SongModel *songModel = sectionModel.songs[ixP.item];
+            songModel.isPlay = !songModel.isPlay;
+            NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:ixP.section];
+            [weakSelf.tableView reloadSections:indexSet withRowAnimation:UITableViewRowAnimationNone];
+            weakSelf.index = ixP;
+        } else {
+            weakSelf.index = nil;
+        }
     };
     if (indexPath.section == 0) {
         [cell configWithSong:model.songs CellType:Top];
@@ -120,8 +119,15 @@
     search.clipsToBounds = YES;
     search.searchBarStyle = UISearchBarStyleMinimal;
     search.frame = CGRectMake(0, 0, self.view.bounds.size.width - 80, 36);
-    search.userInteractionEnabled = NO;
     self.navigationItem.titleView = search;
+    
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(keyboardDown)];
+    tap.cancelsTouchesInView = NO;
+    [self.view addGestureRecognizer:tap];
+}
+
+- (void)keyboardDown {
+    [self.view.window endEditing:YES];
 }
 
 - (void)setupData {
@@ -206,5 +212,9 @@
         sectionModel.songs = songs;
         [self.section addObject:sectionModel];
     }
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    [self keyboardDown];
 }
 @end

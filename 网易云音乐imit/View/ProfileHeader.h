@@ -15,7 +15,8 @@ typedef enum : NSUInteger {
 } SectionType;
 
 @interface ProfileHeader : UITableViewHeaderFooterView
-- (void)configWithType:(SectionType)type;
+- (void)configWithType:(SectionType)type andIndex:(NSInteger)index;
+@property (nonatomic, copy) void(^changeSeg)(SectionType type);
 @end
 
 NS_ASSUME_NONNULL_END

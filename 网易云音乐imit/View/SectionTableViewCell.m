@@ -52,7 +52,6 @@
     [cell configWithData:self.songs[indexPath.item]];
     __weak typeof(self) weakSelf = self;
     cell.changePlay = ^{
-        NSLog(@"手势被处理，更新了item");
         if (weakSelf.changePlay) {
             NSIndexPath *ixp = [NSIndexPath indexPathForItem:indexPath.item inSection:self.section];
             weakSelf.changePlay(ixp);

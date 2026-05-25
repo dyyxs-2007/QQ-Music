@@ -6,26 +6,39 @@
 //
 
 #import "STViewController.h"
-
+#import <Masonry/Masonry.h>
+#import "SwitchStyle.h"
 @interface STViewController ()
-
+@property (nonatomic, strong) UISwitch *switchView;
 @end
 
 @implementation STViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    self.view.backgroundColor = [UIColor systemBackgroundColor];
+    [self setupUI];
 }
 
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+- (void)setupUI {
+    self.switchView = [[UISwitch alloc] init];
+    SwitchStyle *style = [SwitchStyle sharedInstance];
+    self.switchView.on = style.isOn;
+    [self.switchView addTarget:self action:@selector(switchChange) forControlEvents:UIControlEventValueChanged];
+    [self.view addSubview:self.switchView];
+    [self.switchView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.center.equalTo(self.view);
+    }];
 }
-*/
+
+- (void)switchChange {
+    SwitchStyle *style = [SwitchStyle sharedInstance];
+    style.isOn = self.switchView.isOn;
+    if (self.switchView.isOn) {
+        self.view.window.overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
+    } else {
+        self.view.window.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
+    }
+}
 
 @end

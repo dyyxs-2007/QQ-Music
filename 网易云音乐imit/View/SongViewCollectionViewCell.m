@@ -82,7 +82,6 @@
 }
 
 - (void)playChange {
-    NSLog(@"点击了手势");
     if (self.changePlay) {
         self.changePlay();
     }

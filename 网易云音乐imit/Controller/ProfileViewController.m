@@ -12,10 +12,14 @@
 #import "AvatorChangeViewController.h"
 #import "ProfileGroupSongTableViewCell.h"
 #import "ProfileHeader.h"
+#import "SwitchStyle.h"
+#import "STViewController.h"
 
 @interface ProfileViewController () <UITableViewDelegate, UITableViewDataSource, AvatorChangeDelegate>
+@property (nonatomic, assign) NSInteger judge;//0自建1喜欢
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NSMutableArray *section;
+@property (nonatomic, strong) NSMutableArray *loveSection;
 @property (nonatomic, strong) UIImageView *avator;
 @end
 
@@ -29,7 +33,9 @@
 }
 
 - (void)setupData {
+    self.judge = 0;
     self.section = [NSMutableArray array];
+    self.loveSection = [NSMutableArray array];
     NSArray *title = @[
         @"Rain Love",
         @"safe again",
@@ -77,6 +83,30 @@
         model.detail = detail[i];
         [self.section addObject:model];
     }
+    
+    NSArray *loveTitle = @[
+        @"𝓡𝓮𝓬𝓮𝓼𝓼𝓮𝓼的每日三十首",
+        @"Solitude",
+        @"有声节目"
+    ];
+    NSArray *loveDesc = @[
+        @"30首 来自QQ音乐官方歌单",
+        @"1首 奇妙能力歌 - 陈粒",
+        @"自然疗愈场｜雨声助眠白噪音｜雨打芭蕉"
+    ];
+    NSArray *lovePicture = @[
+        @"Flower",
+        @"奇妙能力歌",
+        @"Forest"
+    ];
+    
+    for (NSInteger i = 0; i < loveDesc.count; i++) {
+        GroupSong *model = [[GroupSong alloc] init];
+        model.title = loveTitle[i];
+        model.detail = loveDesc[i];
+        model.picture = lovePicture[i];
+        [self.loveSection addObject:model];
+    }
 }
 
 - (UIView *)setHeaderView {
@@ -86,7 +116,7 @@
     [header addSubview:search];
     search.clipsToBounds = YES;
     search.layer.cornerRadius = 15;
-    search.backgroundColor = [UIColor systemBackgroundColor];
+    search.backgroundColor = [UIColor systemFillColor];
     [search mas_makeConstraints:^(MASConstraintMaker *make) {
         make.height.mas_equalTo(30);
         make.left.equalTo(header).offset(16);
@@ -108,7 +138,7 @@
     UILabel *holder = [[UILabel alloc] init];
     holder.text = @"郁郁 正在热搜";
     holder.font = [UIFont systemFontOfSize:16 weight:UIFontWeightThin];
-    holder.textColor = [UIColor blackColor];
+    holder.textColor = [UIColor labelColor];
     [search addSubview:holder];
     [holder mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(cycle.mas_right).offset(8);
@@ -287,7 +317,10 @@
     if (section == 0) {
         return 1;
     } else {
-        return self.section.count;
+        if (self.judge == 0) {
+            return self.section.count;
+        }
+        return self.loveSection.count;
     }
 }
 
@@ -314,17 +347,31 @@
         return cell;
     }
     ProfileGroupSongTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ProfileGroup" forIndexPath:indexPath];
-    [cell configWithModel:self.section[indexPath.row]];
+    if (self.judge == 0) {
+        [cell configWithModel:self.section[indexPath.row]];
+    } else {
+        [cell configWithModel:self.loveSection[indexPath.row]];
+    }
     return cell;
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     ProfileHeader *header = [tableView dequeueReusableHeaderFooterViewWithIdentifier:@"ProfileHeader"];
     if (section == 0) {
-        [header configWithType:Last];
+        [header configWithType:Last andIndex:self.judge];
     } else {
-        [header configWithType:Myself];
+        [header configWithType:Myself andIndex:self.judge];
     }
+    __weak typeof(self) weakSelf = self;
+    header.changeSeg = ^(SectionType type) {
+        if (type == Last) {
+            weakSelf.judge = 0;
+        } else {
+            weakSelf.judge = 1;
+        }
+        NSIndexSet *set = [NSIndexSet indexSetWithIndex:1];
+        [weakSelf.tableView reloadSections:set withRowAnimation:UITableViewRowAnimationLeft];
+    };
     return header;
 }
 
@@ -332,8 +379,10 @@
     self.tableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStyleGrouped];
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
+    self.tableView.showsVerticalScrollIndicator = NO;
     self.tableView.tableHeaderView = [self setHeaderView];
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    self.tableView.backgroundColor = [UIColor systemGroupedBackgroundColor];
     [self.view addSubview:self.tableView];
     [self.tableView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.edges.equalTo(self.view);
@@ -346,12 +395,13 @@
 
 - (void)setupBar {
     UIBarButtonItem *my = [[UIBarButtonItem alloc] initWithTitle:@"我的" style:UIBarButtonItemStylePlain target:nil action:nil];
-    my.tintColor = [UIColor blackColor];
+    my.tintColor = [UIColor labelColor];
     UIBarButtonItem *enve = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"envelope"] style:UIBarButtonItemStylePlain target:nil action:nil];
-    UIBarButtonItem *setting = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"line.3.horizontal"] style:UIBarButtonItemStylePlain target:nil action:nil];
+    UIBarButtonItem *setting = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"line.3.horizontal"] style:UIBarButtonItemStylePlain target:self action:@selector(selectedSetting)];
     self.navigationItem.leftBarButtonItem = my;
     self.navigationItem.rightBarButtonItems = @[enve, setting];
     self.navigationController.navigationBar.translucent = NO;
+    self.view.backgroundColor = [UIColor systemBackgroundColor];
 }
 
 - (void)avatorTapped {
@@ -364,6 +414,11 @@
 
 - (void)changePictureWithImage:(UIImage *)image {
     self.avator.image = image;
+}
+
+- (void)selectedSetting {
+    STViewController *Setting = [[STViewController alloc] init];
+    [self.navigationController pushViewController:Setting animated:YES];
 }
 
 @end

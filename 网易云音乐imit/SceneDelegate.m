@@ -31,7 +31,7 @@
     
     SettingViewController *setting = [[SettingViewController alloc] init];
     UINavigationController *settingNav = [[UINavigationController alloc] initWithRootViewController:setting];
-    settingNav.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"设置" image:[UIImage systemImageNamed:@"gear"] tag:0];
+    settingNav.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"乐馆" image:[UIImage systemImageNamed:@"globe.europe.africa.fill"] tag:0];
     
     UITabBarController *tabbar = [[UITabBarController alloc] init];
     tabbar.viewControllers = @[homeNav, settingNav, profileNav];
