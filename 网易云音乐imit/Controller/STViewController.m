@@ -1,0 +1,31 @@
+//
+//  STViewController.m
+//  网易云音乐imit
+//
+//  Created by 秋雨梧桐叶落莳 on 2026/5/25.
+//
+
+#import "STViewController.h"
+
+@interface STViewController ()
+
+@end
+
+@implementation STViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end
