@@ -9,8 +9,17 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CellModel : NSObject
+typedef NS_ENUM(NSUInteger, CellType) {
+    cellTypeNormal,
+    cellTypeDetail,
+    cellTypeSwitch,
+};
 
+@interface CellModel : NSObject
+@property (nonatomic, copy) NSString *title;
+@property (nonatomic, copy) NSString *detail;
+@property (nonatomic, assign) CellType type;
+@property (nonatomic, assign) BOOL isOn;
 @end
 
 NS_ASSUME_NONNULL_END

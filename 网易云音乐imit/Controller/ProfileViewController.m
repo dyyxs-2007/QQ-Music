@@ -12,8 +12,10 @@
 #import "AvatorChangeViewController.h"
 #import "ProfileGroupSongTableViewCell.h"
 #import "ProfileHeader.h"
-#import "SwitchStyle.h"
 #import "STViewController.h"
+#import "CellModel.h"
+#import "SectionSettingModel.h"
+
 
 @interface ProfileViewController () <UITableViewDelegate, UITableViewDataSource, AvatorChangeDelegate>
 @property (nonatomic, assign) NSInteger judge;//0自建1喜欢
@@ -21,6 +23,8 @@
 @property (nonatomic, strong) NSMutableArray *section;
 @property (nonatomic, strong) NSMutableArray *loveSection;
 @property (nonatomic, strong) UIImageView *avator;
+
+@property (nonatomic, strong) NSMutableArray *settingSection;
 @end
 
 @implementation ProfileViewController
@@ -106,6 +110,77 @@
         model.detail = loveDesc[i];
         model.picture = lovePicture[i];
         [self.loveSection addObject:model];
+    }
+
+    self.settingSection = [NSMutableArray array];
+    
+    NSArray *headerTitle = @[@"账号", @"歌词", @"播放与下载"];
+    
+    NSArray *titles = @[
+        
+        @[@"个人资料", @"推送设置", @"消息设置", @"隐私设置", @"黑名单设置"],
+        
+        @[@"桌面歌词", @"黑夜模式"],
+        
+        @[@"播放设置", @"音效设置", @"在线试听品质", @"歌曲下载品质",
+          @"允许多应用同时播放", @"播放页动态封面", @"播放页旋转自动进入横屏模式",
+          @"仅Wi-Fi联网", @"流量提醒", @"视频自动播放", @"边听边存",
+          @"音乐缓存上限", @"最近播放列表设置"],
+    ];
+    
+    NSArray *details = @[
+        @[@"", @"", @"", @"", @""],
+        
+        @[@"未开启", @""],
+        
+        @[@"", @"", @"", @"HQ高品质",
+          @"", @"", @"",
+          @"", @"", @"Wi-Fi下开启", @"未开启",
+          @"自动设置", @"跟随账号展示"],
+    ];
+    NSArray *types = @[
+        
+        @[@(cellTypeNormal), @(cellTypeNormal), @(cellTypeNormal),
+          @(cellTypeNormal), @(cellTypeNormal)],
+        
+        @[@(cellTypeDetail), @(cellTypeSwitch)],
+        
+        @[@(cellTypeNormal), @(cellTypeNormal), @(cellTypeNormal),
+          @(cellTypeDetail), @(cellTypeSwitch), @(cellTypeSwitch),
+          @(cellTypeSwitch), @(cellTypeSwitch), @(cellTypeSwitch),
+          @(cellTypeDetail), @(cellTypeDetail),
+          @(cellTypeDetail), @(cellTypeDetail)],
+    ];
+    
+    // switchOn 状态，只有 Switch 类型的有效，其余随便填 NO 占位
+    NSArray *switchStates = @[
+        // 账号
+        @[@NO, @NO, @NO, @NO, @NO],
+        // 歌词
+        @[@NO, @NO],
+        // 播放与下载
+        @[@NO, @NO, @NO, @NO,
+          @NO, @NO, @NO,
+          @NO, @NO, @NO, @NO,
+          @NO, @NO],
+    ];
+    
+    for (int s = 0; s < headerTitle.count; s++) {
+        NSMutableArray *cells = [NSMutableArray array];
+        
+        for (int i = 0; i < [titles[s] count]; i++) {
+            CellModel *model = [[CellModel alloc] init];
+            model.title = titles[s][i];
+            model.detail = details[s][i];
+            model.type = [types[s][i] integerValue];
+            model.isOn = [switchStates[s][i] boolValue];
+            [cells addObject:model];
+        }
+        
+        SectionSettingModel *sectionModel = [[SectionSettingModel alloc] init];
+        sectionModel.title = headerTitle[s];
+        sectionModel.cell = cells;
+        [self.settingSection addObject:sectionModel];
     }
 }
 
@@ -418,6 +493,7 @@
 
 - (void)selectedSetting {
     STViewController *Setting = [[STViewController alloc] init];
+    Setting.section = self.settingSection;
     [self.navigationController pushViewController:Setting animated:YES];
 }
 
