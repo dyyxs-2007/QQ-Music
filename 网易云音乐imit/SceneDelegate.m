@@ -6,9 +6,7 @@
 //
 
 #import "SceneDelegate.h"
-#import "HomeViewController.h"
-#import "ProfileViewController.h"
-#import "SettingViewController.h"
+#import "ContainerViewController.h"
 
 @interface SceneDelegate ()
 
@@ -20,23 +18,7 @@
 - (void)scene:(UIScene *)scene willConnectToSession:(UISceneSession *)session options:(UISceneConnectionOptions *)connectionOptions {
     UIWindowScene *windowScene = (UIWindowScene *)scene;
     self.window = [[UIWindow alloc] initWithWindowScene:windowScene];
-    
-    HomeViewController *home = [[HomeViewController alloc] init];
-    UINavigationController *homeNav = [[UINavigationController alloc] initWithRootViewController:home];
-    homeNav.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"首页" image:[UIImage systemImageNamed:@"house"] tag:0];
-    
-    ProfileViewController *profile = [[ProfileViewController alloc] init];
-    UINavigationController *profileNav = [[UINavigationController alloc] initWithRootViewController:profile];
-    profileNav.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"我的" image:[UIImage systemImageNamed:@"person.circle"] tag:0];
-    
-    SettingViewController *setting = [[SettingViewController alloc] init];
-    UINavigationController *settingNav = [[UINavigationController alloc] initWithRootViewController:setting];
-    settingNav.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"乐馆" image:[UIImage systemImageNamed:@"globe.europe.africa.fill"] tag:0];
-    
-    UITabBarController *tabbar = [[UITabBarController alloc] init];
-    tabbar.viewControllers = @[homeNav, settingNav, profileNav];
-    
-    self.window.rootViewController = tabbar;
+    self.window.rootViewController = [[ContainerViewController alloc] init];
     [self.window makeKeyAndVisible];
 }
 

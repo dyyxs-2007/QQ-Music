@@ -15,6 +15,7 @@
 #import "STViewController.h"
 #import "CellModel.h"
 #import "SectionSettingModel.h"
+#import "ContainerViewController.h"
 
 
 @interface ProfileViewController () <UITableViewDelegate, UITableViewDataSource, AvatorChangeDelegate>
@@ -151,14 +152,12 @@
           @(cellTypeDetail), @(cellTypeDetail),
           @(cellTypeDetail), @(cellTypeDetail)],
     ];
-    
-    // switchOn 状态，只有 Switch 类型的有效，其余随便填 NO 占位
     NSArray *switchStates = @[
-        // 账号
+        
         @[@NO, @NO, @NO, @NO, @NO],
-        // 歌词
+        
         @[@NO, @NO],
-        // 播放与下载
+        
         @[@NO, @NO, @NO, @NO,
           @NO, @NO, @NO,
           @NO, @NO, @NO, @NO,
@@ -430,6 +429,7 @@
     return cell;
 }
 
+
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     ProfileHeader *header = [tableView dequeueReusableHeaderFooterViewWithIdentifier:@"ProfileHeader"];
     if (section == 0) {
@@ -445,7 +445,11 @@
             weakSelf.judge = 1;
         }
         NSIndexSet *set = [NSIndexSet indexSetWithIndex:1];
-        [weakSelf.tableView reloadSections:set withRowAnimation:UITableViewRowAnimationLeft];
+        if (type == Last) {
+            [weakSelf.tableView reloadSections:set withRowAnimation:UITableViewRowAnimationRight];
+        } else {
+            [weakSelf.tableView reloadSections:set withRowAnimation:UITableViewRowAnimationLeft];
+        }
     };
     return header;
 }
@@ -469,7 +473,7 @@
 }
 
 - (void)setupBar {
-    UIBarButtonItem *my = [[UIBarButtonItem alloc] initWithTitle:@"我的" style:UIBarButtonItemStylePlain target:nil action:nil];
+    UIBarButtonItem *my = [[UIBarButtonItem alloc] initWithTitle:@"我的" style:UIBarButtonItemStylePlain target:self action:@selector(pushMenu)];
     my.tintColor = [UIColor labelColor];
     UIBarButtonItem *enve = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"envelope"] style:UIBarButtonItemStylePlain target:nil action:nil];
     UIBarButtonItem *setting = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"line.3.horizontal"] style:UIBarButtonItemStylePlain target:self action:@selector(selectedSetting)];
@@ -477,6 +481,14 @@
     self.navigationItem.rightBarButtonItems = @[enve, setting];
     self.navigationController.navigationBar.translucent = NO;
     self.view.backgroundColor = [UIColor systemBackgroundColor];
+}
+
+- (void)pushMenu {
+    UIViewController *parent = self.parentViewController;
+    while (parent && ![parent isKindOfClass:[ContainerViewController class]]) {
+        parent = parent.parentViewController;
+    }
+    [(ContainerViewController *)parent switchOpen];
 }
 
 - (void)avatorTapped {
@@ -496,5 +508,6 @@
     Setting.section = self.settingSection;
     [self.navigationController pushViewController:Setting animated:YES];
 }
+
 
 @end
